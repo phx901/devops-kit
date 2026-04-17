@@ -1,9 +1,9 @@
 # devops-kit
 
-<table width="100%"><tr>
-<td>Shared GitHub Actions workflows and configuration used across <code>adanze</code> repositories.</td>
-<td align="right"><a href="https://github.com/adanze/devops-kit/actions/workflows/ci.yml"><img src="https://github.com/adanze/devops-kit/actions/workflows/ci.yml/badge.svg" alt="DevOps Kit CI"></a></td>
-</tr></table>
+<a href="https://github.com/adanze/devops-kit/actions/workflows/ci.yml"><img src="https://github.com/adanze/devops-kit/actions/workflows/ci.yml/badge.svg" alt="DevOps Kit CI" align="right"></a>
+
+Shared GitHub Actions workflows and configuration used across `adanze` repositories.
+
 
 ## Reusable Workflows
 
