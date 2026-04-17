@@ -1,5 +1,7 @@
 # devops-kit
 
+[![DevOps Kit CI](https://github.com/adanze/devops-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/adanze/devops-kit/actions/workflows/ci.yml)
+
 Shared GitHub Actions workflows and configuration used across `adanze` repositories.
 
 ## Reusable Workflows
