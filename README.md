@@ -1,10 +1,12 @@
 # devops-kit
 
-[![DevOps Kit CI](https://github.com/adanze/devops-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/adanze/devops-kit/actions/workflows/ci.yml)
+[![DevOps Kit CI](https://github.com/phx901/devops-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/phx901/devops-kit/actions/workflows/ci.yml)
 
-Shared GitHub Actions workflows and configuration used across `adanze` repositories.
+Central repository for shared GitHub Actions workflows and configuration.
 
 ## Reusable Workflows
+
+The following workflows can be integrated into your projects for common CI/CD tasks.
 
 ### Version Calculation — `semver-create.yml`
 
@@ -15,7 +17,7 @@ Calculates the semantic version using [GitVersion](https://gitversion.net/) and 
 ```yaml
 jobs:
   versioning:
-    uses: adanze/devops-kit/.github/workflows/semver-create.yml@main
+    uses: phx901/devops-kit/.github/workflows/semver-create.yml@main
 ```
 
 ---
@@ -29,7 +31,7 @@ Creates and pushes a `vX.Y.Z` tag to the repository.
 ```yaml
 jobs:
   tagging:
-    uses: adanze/devops-kit/.github/workflows/semver-tag.yml@main
+    uses: phx901/devops-kit/.github/workflows/semver-tag.yml@main
     permissions:
       contents: write
     with:
@@ -47,7 +49,7 @@ Installs dependencies, runs tests, and builds a Node.js project.
 ```yaml
 jobs:
   build:
-    uses: adanze/devops-kit/.github/workflows/nodejs-build.yml@main
+    uses: phx901/devops-kit/.github/workflows/nodejs-build.yml@main
     with:
       working-directory: ./my-app
 ```
