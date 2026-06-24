@@ -16,9 +16,9 @@ on:
         type: boolean
         default: false
       artifact-name:
-        description: Name for the uploaded artifact
+        description: Name for the uploaded artifact (required when upload-artifact is true)
         type: string
-        default: "dist"
+        default: ""
 
 jobs:
   build:

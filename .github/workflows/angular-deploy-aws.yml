@@ -6,7 +6,7 @@ on:
       artifact-name:
         description: Name of the artifact uploaded by the build job
         type: string
-        default: "dist"
+        required: true
       dist-path:
         description: Path within the artifact to sync (e.g. angular-app/browser)
         type: string
