@@ -42,9 +42,9 @@ jobs:
 
 ### Node.js Build & Test — `nodejs-build.yml`
 
-Installs dependencies, runs tests, and builds a Node.js project.
+Installs dependencies, runs tests, and builds a Node.js project. Optionally uploads the `dist/` folder as a GitHub Artifact for downstream jobs.
 
-**Inputs:** `working-directory` (required), `test-args` (optional)
+**Inputs:** `working-directory` (required), `test-args` (optional), `upload-artifact` (optional, default: `false`), `artifact-name` (required when `upload-artifact` is `true`)
 
 ```yaml
 jobs:
@@ -52,6 +52,33 @@ jobs:
     uses: phx901/devops-kit/.github/workflows/nodejs-build.yml@main
     with:
       working-directory: ./my-app
+      upload-artifact: true
+      artifact-name: my-app-dist
+```
+
+---
+
+### Angular Deploy to AWS — `angular-deploy-aws.yml`
+
+Downloads a build artifact and deploys it to an S3 bucket, then invalidates a CloudFront distribution.
+
+**Inputs:** `artifact-name` (required), `dist-path` (required), `s3-bucket` (required), `cloudfront-distribution-id` (required), `aws-region` (required)
+
+**Secrets:** `aws-access-key-id` (required), `aws-secret-access-key` (required)
+
+```yaml
+jobs:
+  deploy:
+    uses: phx901/devops-kit/.github/workflows/angular-deploy-aws.yml@main
+    with:
+      artifact-name: my-app-dist
+      dist-path: my-app/browser
+      s3-bucket: my-bucket
+      cloudfront-distribution-id: ABCDEF123456
+      aws-region: eu-central-1
+    secrets:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 ```
 
 ## Branching Strategy
