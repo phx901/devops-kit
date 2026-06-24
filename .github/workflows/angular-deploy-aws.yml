@@ -1,0 +1,55 @@
+name: Angular - Deploy to AWS
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Name of the artifact uploaded by the build job
+        type: string
+        default: "dist"
+      dist-path:
+        description: Path within the artifact to sync (e.g. angular-app/browser)
+        type: string
+        required: true
+      s3-bucket:
+        description: S3 bucket name to deploy to
+        type: string
+        required: true
+      cloudfront-distribution-id:
+        description: CloudFront distribution ID to invalidate
+        type: string
+        required: true
+      aws-region:
+        description: AWS region
+        type: string
+        required: true
+    secrets:
+      aws-access-key-id:
+        required: true
+      aws-secret-access-key:
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: dist
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: ${{ inputs.aws-region }}
+
+      - name: Sync to S3
+        run: aws s3 sync dist/${{ inputs.dist-path }} s3://${{ inputs.s3-bucket }} --delete
+
+      - name: Invalidate CloudFront Cache
+        run: aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront-distribution-id }} --paths "/*"
