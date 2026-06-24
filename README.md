@@ -42,16 +42,33 @@ jobs:
 
 ### Node.js Build & Test — `nodejs-build.yml`
 
-Installs dependencies, runs tests, and builds a Node.js project. Optionally uploads the `dist/` folder as a GitHub Artifact for downstream jobs.
+Installs dependencies, runs tests, and builds a Node.js project.
 
-**Inputs:** `working-directory` (required), `test-args` (optional), `upload-artifact` (optional, default: `false`), `artifact-name` (required when `upload-artifact` is `true`)
+**Inputs:** `working-directory` (required), `test-args` (optional)
 
 ```yaml
 jobs:
   build:
     uses: phx901/devops-kit/.github/workflows/nodejs-build.yml@main
     with:
-      working-directory: ./my-app
+      working-directory: ./my-api
+```
+
+---
+
+### Angular Build & Test — `angular-build.yml`
+
+Installs dependencies, runs tests, injects the version into `version.ts`, builds the Angular project and uploads the `dist/` folder as a GitHub Artifact.
+
+**Inputs:** `working-directory` (required), `version` (optional), `version-file-path` (optional, default: `src/environments/version.ts`), `test-args` (optional), `upload-artifact` (optional, default: `false`), `artifact-name` (required when `upload-artifact` is `true`)
+
+```yaml
+jobs:
+  build:
+    uses: phx901/devops-kit/.github/workflows/angular-build.yml@main
+    with:
+      working-directory: ./my-angular-app
+      version: ${{ needs.versioning.outputs.semver }}
       upload-artifact: true
       artifact-name: my-app-dist
 ```
