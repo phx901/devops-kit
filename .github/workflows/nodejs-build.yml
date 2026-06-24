@@ -11,14 +11,6 @@ on:
         description: Extra arguments to pass to npm test (e.g. --no-watch, --run)
         type: string
         default: ""
-      upload-artifact:
-        description: Upload the dist/ folder as a GitHub Artifact
-        type: boolean
-        default: false
-      artifact-name:
-        description: Name for the uploaded artifact (required when upload-artifact is true)
-        type: string
-        default: ""
 
 jobs:
   build:
@@ -45,10 +37,3 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: ${{ inputs.working-directory }}
-
-      - name: Upload Artifact
-        if: inputs.upload-artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.artifact-name }}
-          path: ${{ inputs.working-directory }}/dist

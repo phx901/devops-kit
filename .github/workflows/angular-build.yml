@@ -1,0 +1,69 @@
+name: Angular - Build and Test
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Directory containing the Angular project
+        type: string
+        required: true
+      version:
+        description: Application version to embed at build time (e.g. 1.2.3-alpha)
+        type: string
+        default: ""
+      version-file-path:
+        description: Path where version.ts is written relative to working-directory
+        type: string
+        default: "src/environments/version.ts"
+      test-args:
+        description: Extra arguments to pass to npm test (e.g. --no-watch, --run)
+        type: string
+        default: ""
+      upload-artifact:
+        description: Upload the dist/ folder as a GitHub Artifact
+        type: boolean
+        default: false
+      artifact-name:
+        description: Name for the uploaded artifact (required when upload-artifact is true)
+        type: string
+        default: ""
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: "24.16.0"
+
+      - name: Install Dependencies
+        run: npm ci
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Run Tests
+        run: npm test -- ${{ inputs.test-args }}
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Inject Version
+        if: inputs.version != ''
+        run: |
+          mkdir -p $(dirname "${{ inputs.version-file-path }}")
+          printf "export const APP_VERSION = '%s';\n" "${{ inputs.version }}" > "${{ inputs.version-file-path }}"
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Build
+        run: npm run build
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Upload Artifact
+        if: inputs.upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working-directory }}/dist
