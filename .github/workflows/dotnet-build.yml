@@ -27,8 +27,16 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Run Tests
-        run: dotnet test --no-restore
+        run: dotnet test --no-restore --logger trx --results-directory TestResults
         working-directory: ${{ inputs.working-directory }}
+
+      - name: Test Summary
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: .NET Tests
+          path: ${{ inputs.working-directory }}/TestResults/*.trx
+          reporter: dotnet-trx
 
       - name: Build
         run: dotnet build --no-restore
