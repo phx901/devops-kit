@@ -55,6 +55,7 @@ jobs:
           reporter: dotnet-trx
 
       - name: Build
+        if: ${{ !inputs.upload-artifact }}
         run: dotnet build --no-restore
         working-directory: ${{ inputs.working-directory }}
 
