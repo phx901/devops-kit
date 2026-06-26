@@ -75,6 +75,22 @@ jobs:
 
 ---
 
+### .NET Build & Test — `dotnet-build.yml`
+
+Restores dependencies, runs tests (with TRX report), and builds a .NET project.
+
+**Inputs:** `working-directory` (required)
+
+```yaml
+jobs:
+  build:
+    uses: phx901/devops-kit/.github/workflows/dotnet-build.yml@main
+    with:
+      working-directory: ./my-dotnet-app
+```
+
+---
+
 ### Angular Deploy to AWS — `angular-deploy-aws.yml`
 
 Downloads a build artifact and deploys it to an S3 bucket, then invalidates a CloudFront distribution.
