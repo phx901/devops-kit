@@ -1,0 +1,48 @@
+name: .NET - Deploy to AWS Lambda
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Name of the artifact uploaded by the build job
+        type: string
+        required: true
+      lambda-function-name:
+        description: Name of the Lambda function to update
+        type: string
+        required: true
+      aws-region:
+        description: AWS region
+        type: string
+        required: true
+    secrets:
+      aws-access-key-id:
+        required: true
+      aws-secret-access-key:
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy to AWS Lambda
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: publish
+
+      - name: Create Lambda Package
+        run: zip -r lambda-package.zip .
+        working-directory: publish
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: ${{ inputs.aws-region }}
+
+      - name: Update Lambda Function Code
+        run: aws lambda update-function-code --function-name ${{ inputs.lambda-function-name }} --zip-file fileb://publish/lambda-package.zip

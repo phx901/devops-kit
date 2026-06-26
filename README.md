@@ -77,16 +77,19 @@ jobs:
 
 ### .NET Build & Test — `dotnet-build.yml`
 
-Restores dependencies, runs tests (with TRX report), and builds a .NET project.
+Restores dependencies, runs tests (with TRX report), builds, and optionally publishes a .NET project and uploads the output as a GitHub Artifact.
 
-**Inputs:** `working-directory` (required)
+**Inputs:** `working-directory` (required), `publish-project` (optional), `runtime` (optional, default: `linux-arm64`), `upload-artifact` (optional, default: `false`), `artifact-name` (required when `upload-artifact` is `true`)
 
 ```yaml
 jobs:
   build:
     uses: phx901/devops-kit/.github/workflows/dotnet-build.yml@main
     with:
-      working-directory: ./my-dotnet-app
+      working-directory: ./my-dotnet-api
+      publish-project: src/MyApi/MyApi.csproj
+      upload-artifact: true
+      artifact-name: dotnet-dist
 ```
 
 ---
@@ -108,6 +111,29 @@ jobs:
       dist-path: my-app/browser
       s3-bucket: my-bucket
       cloudfront-distribution-id: ABCDEF123456
+      aws-region: eu-central-1
+    secrets:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+```
+
+---
+
+### .NET Deploy to AWS Lambda — `dotnet-deploy-aws-lambda.yml`
+
+Downloads a build artifact, packages it as a ZIP, and deploys it to an AWS Lambda function.
+
+**Inputs:** `artifact-name` (required), `lambda-function-name` (required), `aws-region` (required)
+
+**Secrets:** `aws-access-key-id` (required), `aws-secret-access-key` (required)
+
+```yaml
+jobs:
+  deploy:
+    uses: phx901/devops-kit/.github/workflows/dotnet-deploy-aws-lambda.yml@main
+    with:
+      artifact-name: dotnet-dist
+      lambda-function-name: my-lambda-function
       aws-region: eu-central-1
     secrets:
       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
