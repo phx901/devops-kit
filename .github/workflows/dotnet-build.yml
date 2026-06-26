@@ -7,6 +7,22 @@ on:
         description: Directory containing the .NET solution
         type: string
         required: true
+      publish-project:
+        description: Path to the .csproj to publish relative to working-directory (required when upload-artifact is true)
+        type: string
+        default: ""
+      runtime:
+        description: Runtime identifier for dotnet publish (e.g. linux-arm64)
+        type: string
+        default: "linux-arm64"
+      upload-artifact:
+        description: Upload the publish output as a GitHub Artifact
+        type: boolean
+        default: false
+      artifact-name:
+        description: Name for the uploaded artifact (required when upload-artifact is true)
+        type: string
+        default: ""
 
 jobs:
   build:
@@ -39,5 +55,18 @@ jobs:
           reporter: dotnet-trx
 
       - name: Build
+        if: ${{ !inputs.upload-artifact }}
         run: dotnet build --no-restore
         working-directory: ${{ inputs.working-directory }}
+
+      - name: Publish
+        if: inputs.upload-artifact
+        run: dotnet publish ${{ inputs.publish-project }} -c Release -r ${{ inputs.runtime }} --self-contained false -o publish
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Upload Artifact
+        if: inputs.upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working-directory }}/publish
