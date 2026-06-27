@@ -121,9 +121,9 @@ jobs:
 
 ### .NET Deploy to AWS Lambda — `dotnet-deploy-aws-lambda.yml`
 
-Downloads a build artifact, packages it as a ZIP, and deploys it to an AWS Lambda function.
+Downloads a build artifact, packages it as a ZIP, deploys it to an AWS Lambda function, and optionally sets the `AppVersion` Lambda environment variable.
 
-**Inputs:** `artifact-name` (required), `lambda-function-name` (required), `aws-region` (required)
+**Inputs:** `artifact-name` (required), `lambda-function-name` (required), `aws-region` (required), `version` (optional)
 
 **Secrets:** `aws-access-key-id` (required), `aws-secret-access-key` (required)
 
@@ -135,6 +135,7 @@ jobs:
       artifact-name: dotnet-dist
       lambda-function-name: my-lambda-function
       aws-region: eu-central-1
+      version: ${{ needs.versioning.outputs.version }}
     secrets:
       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
