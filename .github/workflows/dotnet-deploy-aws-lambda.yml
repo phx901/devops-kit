@@ -62,4 +62,4 @@ jobs:
           UPDATED_VARS=$(echo "$CURRENT_VARS" | jq --arg v "${{ inputs.version }}" '. + {AppVersion: $v}')
           aws lambda update-function-configuration \
             --function-name ${{ inputs.lambda-function-name }} \
-            --environment "Variables=$UPDATED_VARS"
+            --environment "{\"Variables\": $UPDATED_VARS}"
