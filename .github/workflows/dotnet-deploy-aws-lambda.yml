@@ -11,6 +11,10 @@ on:
         description: Name of the Lambda function to update
         type: string
         required: true
+      version:
+        description: Application version to set as Lambda environment variable (e.g. 1.2.3)
+        type: string
+        default: ""
       aws-region:
         description: AWS region
         type: string
@@ -46,3 +50,16 @@ jobs:
 
       - name: Update Lambda Function Code
         run: aws lambda update-function-code --function-name ${{ inputs.lambda-function-name }} --zip-file fileb://publish/lambda-package.zip
+
+      - name: Set Lambda Version Environment Variable
+        if: inputs.version != ''
+        run: |
+          aws lambda wait function-updated --function-name ${{ inputs.lambda-function-name }}
+          CURRENT_VARS=$(aws lambda get-function-configuration \
+            --function-name ${{ inputs.lambda-function-name }} \
+            --query 'Environment.Variables' \
+            --output json)
+          UPDATED_VARS=$(echo "$CURRENT_VARS" | jq --arg v "${{ inputs.version }}" '. + {AppVersion: $v}')
+          aws lambda update-function-configuration \
+            --function-name ${{ inputs.lambda-function-name }} \
+            --environment "Variables=$UPDATED_VARS"
