@@ -7,6 +7,7 @@ on:
       - "feature/**"
       - "patch/**"
       - "hotfix/**"
+      - "bugfix/**"
       - "dependabot/**"
   pull_request:
     branches:

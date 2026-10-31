@@ -4,11 +4,8 @@ on:
   workflow_call:
     outputs:
       version:
-        description: MajorMinorPatch version (e.g. 1.2.3)
+        description: Full SemVer version (e.g. 1.2.3 on main, 1.3.0-alpha.4 on other branches)
         value: ${{ jobs.versioning.outputs.version }}
-      semver:
-        description: Full SemVer version (e.g. 1.2.3-alpha.4)
-        value: ${{ jobs.versioning.outputs.semver }}
 
 jobs:
   versioning:
@@ -45,9 +42,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Version Format | Value |" >> $GITHUB_STEP_SUMMARY
           echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
-          echo "| MajorMinorPatch | \`${{ steps.gitversion.outputs.majorMinorPatch }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| SemVer | \`${{ steps.gitversion.outputs.semVer }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | \`${{ steps.gitversion.outputs.semVer }}\` |" >> $GITHUB_STEP_SUMMARY
 
     outputs:
-      version: ${{ steps.gitversion.outputs.majorMinorPatch }}
-      semver: ${{ steps.gitversion.outputs.semVer }}
+      version: ${{ steps.gitversion.outputs.semVer }}

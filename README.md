@@ -12,7 +12,7 @@ The following workflows can be integrated into your projects for common CI/CD ta
 
 Calculates the semantic version using [GitVersion](https://gitversion.net/) and the `GitVersion.yaml` config from this repo.
 
-**Outputs:** `version` (e.g. `1.2.3`), `semver` (e.g. `1.2.3-alpha.4`)
+**Outputs:** `version` (SemVer, e.g. `1.2.3` on `main`, `1.3.0-alpha.4` on other branches)
 
 ```yaml
 jobs:
@@ -68,7 +68,7 @@ jobs:
     uses: phx901/devops-kit/.github/workflows/angular-build.yml@main
     with:
       working-directory: ./my-angular-app
-      version: ${{ needs.versioning.outputs.semver }}
+      version: ${{ needs.versioning.outputs.version }}
       upload-artifact: true
       artifact-name: my-app-dist
 ```
@@ -143,14 +143,15 @@ jobs:
 
 ## Branching Strategy
 
-Managed via `GitVersion.yaml` in `ContinuousDelivery` mode:
+[GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow): short-lived branches, merged into `main` via pull request.
 
-| Branch pattern      | Increment | Label   |
-|---------------------|-----------|---------|
-| `main`              | None      | —       |
-| `develop`           | None      | `beta`  |
-| `feature/*`         | Minor     | `alpha` |
-| `patch/*` / `hotfix/*` / `bugfix/*` | Patch | `alpha` |
+Versioning is managed via `GitVersion.yaml`:
+
+| Branch pattern                                       | Mode                 | Increment     | Label   | Example version |
+|------------------------------------------------------|----------------------|---------------|---------|-----------------|
+| `main`                                               | ContinuousDeployment | Merged branch | —       | `9.0.1`         |
+| `feature/*`                                          | ContinuousDelivery   | Minor         | `alpha` | `9.1.0-alpha.4` |
+| `patch/*` / `hotfix/*` / `bugfix/*` / `dependabot/*` | ContinuousDelivery   | Patch         | `alpha` | `9.0.2-alpha.2` |
 
 Tags are prefixed with `v` (e.g. `v1.2.3`).
 
