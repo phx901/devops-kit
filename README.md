@@ -12,7 +12,7 @@ The following workflows can be integrated into your projects for common CI/CD ta
 
 Calculates the semantic version using [GitVersion](https://gitversion.net/) and the `GitVersion.yaml` config from this repo.
 
-**Outputs:** `version` (e.g. `1.2.3`), `semver` (e.g. `1.2.3-alpha.4`)
+**Outputs:** `version` (SemVer, e.g. `1.2.3` on `main`, `1.3.0-alpha.4` on other branches)
 
 ```yaml
 jobs:
@@ -68,7 +68,7 @@ jobs:
     uses: phx901/devops-kit/.github/workflows/angular-build.yml@main
     with:
       working-directory: ./my-angular-app
-      version: ${{ needs.versioning.outputs.semver }}
+      version: ${{ needs.versioning.outputs.version }}
       upload-artifact: true
       artifact-name: my-app-dist
 ```
