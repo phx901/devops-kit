@@ -16,7 +16,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7.0.1
         with:
-          ref: ${{ github.head_ref || github.ref }}
           fetch-depth: 0
           fetch-tags: true
 
@@ -34,8 +33,6 @@ jobs:
       - name: Determine Version
         id: gitversion
         uses: gittools/actions/gitversion/execute@v4.7.0
-        env:
-          GITHUB_REF: ${{ github.head_ref && format('refs/heads/{0}', github.head_ref) || github.ref }}
         with:
           configFilePath: .gitversion/GitVersion.yaml
 

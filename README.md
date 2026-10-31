@@ -152,6 +152,7 @@ Versioning is managed via `GitVersion.yaml`:
 | `main`                                               | ContinuousDeployment | Merged branch | —       | `9.0.1`         |
 | `feature/*`                                          | ContinuousDelivery   | Minor         | `alpha` | `9.1.0-alpha.4` |
 | `patch/*` / `hotfix/*` / `bugfix/*` / `dependabot/*` | ContinuousDelivery   | Patch         | `alpha` | `9.0.2-alpha.2` |
+| Pull request                                         | ContinuousDelivery   | Source branch | `PullRequest<n>` | `9.0.2-PullRequest12.1` |
 
 Tags are prefixed with `v` (e.g. `v1.2.3`).
 
