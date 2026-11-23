@@ -1,48 +1,63 @@
 calculation:
+  mode: ContinuousDelivery
+  tag-prefix: v
+
+  commit-message-incrementing: Enabled
+  major-version-bump-message: '(?i)\+semver:\s?breaking'
+  minor-version-bump-message: '(?i)merge.*feature/'
+  patch-version-bump-message: '(?i)merge.*(patch|hotfix|bugfix|dependabot)/'
+  no-bump-message: '(?i)\+semver:\s?(none|skip)'
+
   branches:
     main:
-      increment: None
-      is-main-branch: true
-      label: ''
-      mode: ContinuousDeployment
       regex: ^main$
+      mode: ContinuousDeployment
+      increment: None
+      label: ''
       source-branches: []
+      is-main-branch: true
       track-merge-message: true
+
     feature:
+      regex: ^feature/.+
       increment: Minor
       label: alpha
-      regex: ^feature/.+
       source-branches:
         - main
       track-merge-message: false
+
     patch:
-      increment: Patch
-      label: alpha
       regex: ^patch/.+
+      increment: Patch
+      label: alpha
       source-branches:
         - main
       track-merge-message: false
+
     hotfix:
-      increment: Patch
-      label: alpha
       regex: ^hotfix/.+
+      increment: Patch
+      label: alpha
       source-branches:
         - main
       track-merge-message: false
+
     bugfix:
-      increment: Patch
-      label: alpha
       regex: ^bugfix/.+
-      source-branches:
-        - main
-      track-merge-message: false
-    dependabot:
       increment: Patch
       label: alpha
-      regex: ^dependabot/.+
       source-branches:
         - main
       track-merge-message: false
+
+    dependabot:
+      regex: ^dependabot/.+
+      increment: Patch
+      label: alpha
+      source-branches:
+        - main
+      track-merge-message: false
+
     pull-request:
       increment: Inherit
       source-branches:
@@ -52,13 +67,6 @@ calculation:
         - hotfix
         - bugfix
         - dependabot
-  commit-message-incrementing: Enabled
+
   ignore:
     sha: []
-  major-version-bump-message: "(?i)\\+semver:\\s?breaking"
-  minor-version-bump-message: "(?i)merge.*feature/"
-  mode: ContinuousDelivery
-  no-bump-message: "(?i)\\+semver:\\s?(none|skip)"
-  patch-version-bump-message: "(?i)merge.*(patch|hotfix|bugfix|dependabot)/"
-  tag-prefix: v
-output: {}
