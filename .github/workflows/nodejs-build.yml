@@ -11,6 +11,22 @@ on:
         description: Extra arguments to pass to npm test (e.g. --no-watch, --run)
         type: string
         default: ""
+      build-output-path:
+        description: Build output folder relative to working-directory
+        type: string
+        default: "dist"
+      install-production-dependencies:
+        description: Copy package.json and package-lock.json into the build output and install production dependencies there
+        type: boolean
+        default: false
+      upload-artifact:
+        description: Upload the build output as a GitHub Artifact
+        type: boolean
+        default: false
+      artifact-name:
+        description: Name for the uploaded artifact (required when upload-artifact is true)
+        type: string
+        default: ""
 
 jobs:
   build:
@@ -37,3 +53,18 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: ${{ inputs.working-directory }}
+
+      - name: Install Production Dependencies
+        if: inputs.install-production-dependencies
+        run: |
+          cp package.json package-lock.json "${{ inputs.build-output-path }}/"
+          cd "${{ inputs.build-output-path }}"
+          npm ci --omit=dev
+        working-directory: ${{ inputs.working-directory }}
+
+      - name: Upload Artifact
+        if: inputs.upload-artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working-directory }}/${{ inputs.build-output-path }}
