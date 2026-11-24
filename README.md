@@ -22,11 +22,9 @@ jobs:
 
 ---
 
-### Git Tagging — `semver-tag.yml`
+### Version Tagging — `semver-tag.yml`
 
 Creates and pushes a `vX.Y.Z` tag to the repository.
-
-**Inputs:** `version` (required, e.g. `1.2.3`)
 
 ```yaml
 jobs:
@@ -38,13 +36,17 @@ jobs:
       version: ${{ needs.versioning.outputs.version }}
 ```
 
+**Inputs:**
+
+| Input | Required | Default | Description |
+|---|---|---|---|
+| `version` | ✅ | – | Version to tag, e.g. `1.2.3` |
+
 ---
 
 ### Node.js Build & Test — `nodejs-build.yml`
 
-Installs dependencies, runs tests, and builds a Node.js project.
-
-**Inputs:** `working-directory` (required), `test-args` (optional)
+Installs dependencies, runs tests, builds a Node.js project and optionally bundles production dependencies into the build output and uploads it as a GitHub Artifact.
 
 ```yaml
 jobs:
@@ -54,13 +56,33 @@ jobs:
       working-directory: ./my-api
 ```
 
+```yaml
+jobs:
+  build:
+    uses: phx901/devops-kit/.github/workflows/nodejs-build.yml@main
+    with:
+      working-directory: ./my-api
+      install-production-dependencies: true
+      upload-artifact: true
+      artifact-name: nodejs-dist
+```
+
+**Inputs:**
+
+| Input | Required | Default | Description |
+|---|---|---|---|
+| `working-directory` | ✅ | – | Directory containing the Node.js project |
+| `test-args` | – | `""` | Extra arguments to pass to npm test (e.g. `--no-watch`, `--run`) |
+| `build-output-path` | – | `dist` | Build output folder relative to `working-directory` |
+| `install-production-dependencies` | – | `false` | Copy `package.json` and `package-lock.json` into the build output and install production dependencies there |
+| `upload-artifact` | – | `false` | Upload the build output as a GitHub Artifact |
+| `artifact-name` | ✅ (when `upload-artifact` is `true`) | `""` | Name for the uploaded artifact |
+
 ---
 
 ### Angular Build & Test — `angular-build.yml`
 
 Installs dependencies, runs tests, injects the version into `version.ts`, builds the Angular project and uploads the `dist/` folder as a GitHub Artifact.
-
-**Inputs:** `working-directory` (required), `version` (optional), `version-file-path` (optional, default: `src/environments/version.ts`), `test-args` (optional), `upload-artifact` (optional, default: `false`), `artifact-name` (required when `upload-artifact` is `true`)
 
 ```yaml
 jobs:
@@ -73,13 +95,22 @@ jobs:
       artifact-name: my-app-dist
 ```
 
+**Inputs:**
+
+| Input | Required | Default | Description |
+|---|---|---|---|
+| `working-directory` | ✅ | – | Directory containing the Angular project |
+| `version` | – | – | Version to inject into `version.ts` |
+| `version-file-path` | – | `src/environments/version.ts` | Path to the version file (relative to `working-directory`) |
+| `test-args` | – | `""` | Extra arguments to pass to npm test (e.g. `--no-watch`) |
+| `upload-artifact` | – | `false` | Upload the `dist/` folder as a GitHub Artifact |
+| `artifact-name` | ✅ (when `upload-artifact` is `true`) | `""` | Name for the uploaded artifact |
+
 ---
 
 ### .NET Build & Test — `dotnet-build.yml`
 
 Restores dependencies, runs tests (with TRX report), builds, and optionally publishes a .NET project and uploads the output as a GitHub Artifact.
-
-**Inputs:** `working-directory` (required), `publish-project` (optional), `runtime` (optional, default: `linux-arm64`), `upload-artifact` (optional, default: `false`), `artifact-name` (required when `upload-artifact` is `true`)
 
 ```yaml
 jobs:
@@ -92,15 +123,21 @@ jobs:
       artifact-name: dotnet-dist
 ```
 
+**Inputs:**
+
+| Input | Required | Default | Description |
+|---|---|---|---|
+| `working-directory` | ✅ | – | Directory containing the .NET project |
+| `publish-project` | – | – | Project file to publish (e.g. `src/MyApi/MyApi.csproj`) |
+| `runtime` | – | `linux-arm64` | Publish runtime |
+| `upload-artifact` | – | `false` | Upload the publish output as a GitHub Artifact |
+| `artifact-name` | ✅ (when `upload-artifact` is `true`) | `""` | Name for the uploaded artifact |
+
 ---
 
 ### Angular Deploy to AWS — `angular-deploy-aws.yml`
 
 Downloads a build artifact and deploys it to an S3 bucket, then invalidates a CloudFront distribution.
-
-**Inputs:** `artifact-name` (required), `dist-path` (required), `s3-bucket` (required), `cloudfront-distribution-id` (required), `aws-region` (required)
-
-**Secrets:** `aws-access-key-id` (required), `aws-secret-access-key` (required)
 
 ```yaml
 jobs:
@@ -117,22 +154,35 @@ jobs:
       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 ```
 
+**Inputs:**
+
+| Input | Required | Default | Description |
+|---|---|---|---|
+| `artifact-name` | ✅ | – | Name of the artifact uploaded by the build job |
+| `dist-path` | ✅ | – | Path to the `dist` folder inside the artifact (e.g. `my-app/browser`) |
+| `s3-bucket` | ✅ | – | S3 bucket to sync to |
+| `cloudfront-distribution-id` | ✅ | – | CloudFront distribution to invalidate |
+| `aws-region` | ✅ | – | AWS region |
+
+**Secrets:**
+
+| Secret | Required |
+|---|---|
+| `aws-access-key-id` | ✅ |
+| `aws-secret-access-key` | ✅ |
+
 ---
 
-### .NET Deploy to AWS Lambda — `dotnet-deploy-aws-lambda.yml`
+### Deploy to AWS Lambda — `aws-lambda-deploy.yml`
 
-Downloads a build artifact, packages it as a ZIP, deploys it to an AWS Lambda function, and optionally sets the `AppVersion` Lambda environment variable.
-
-**Inputs:** `artifact-name` (required), `lambda-function-name` (required), `aws-region` (required), `version` (optional)
-
-**Secrets:** `aws-access-key-id` (required), `aws-secret-access-key` (required)
+Downloads a build artifact, packages it as a ZIP, deploys it to an AWS Lambda function, and optionally sets the `AppVersion` Lambda environment variable. Works for any Lambda runtime whose artifact can be zipped as-is (e.g. Node.js artifacts from `nodejs-build.yml`).
 
 ```yaml
 jobs:
   deploy:
-    uses: phx901/devops-kit/.github/workflows/dotnet-deploy-aws-lambda.yml@main
+    uses: phx901/devops-kit/.github/workflows/aws-lambda-deploy.yml@main
     with:
-      artifact-name: dotnet-dist
+      artifact-name: nodejs-dist
       lambda-function-name: my-lambda-function
       aws-region: eu-central-1
       version: ${{ needs.versioning.outputs.version }}
@@ -140,6 +190,22 @@ jobs:
       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 ```
+
+**Inputs:**
+
+| Input | Required | Default | Description |
+|---|---|---|---|
+| `artifact-name` | ✅ | – | Name of the artifact uploaded by the build job |
+| `lambda-function-name` | ✅ | – | Name of the Lambda function to update |
+| `aws-region` | ✅ | – | AWS region |
+| `version` | – | `""` | Application version to set as Lambda environment variable `AppVersion` (e.g. `1.2.3`) |
+
+**Secrets:**
+
+| Secret | Required |
+|---|---|
+| `aws-access-key-id` | ✅ |
+| `aws-secret-access-key` | ✅ |
 
 ## Branching Strategy
 

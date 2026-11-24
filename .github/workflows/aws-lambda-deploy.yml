@@ -1,4 +1,4 @@
-name: .NET - Deploy to AWS Lambda
+name: Deploy to AWS Lambda
 
 on:
   workflow_call:
