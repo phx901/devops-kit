@@ -27,4 +27,3 @@ Follow these principles across all languages and frameworks to ensure clean, mai
 - Whenever a workflow file under `.github/workflows/` is added, modified, or removed, update `README.md` accordingly.
 - Each workflow must have a section under `## Reusable Workflows` documenting its name, purpose, inputs, outputs, secrets, and a minimal usage example.
 - Keep sections grouped by concern in this order: **Versioning** → **Build & Test** → **Deployment**. Within each group, order alphabetically by technology.
-
